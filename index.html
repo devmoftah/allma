@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#06080f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="اللمة" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <title>اللمة - لعبة المعلومات</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="questions.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --blue: #2d7ff9;
+            --blue-glow: rgba(45, 127, 249, 0.35);
+            --orange: #ff6b2b;
+            --orange-glow: rgba(255, 107, 43, 0.35);
+            --gold: #f0c040;
+            --green: #22c55e;
+            --purple: #a855f7;
+            --red: #ef4444;
+            --bg-deep: #06080f;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.06);
+            --text: #e8eaf0;
+            --text-dim: #6b7394;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 600px 400px at 20% 20%, rgba(45, 127, 249, 0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 500px at 80% 80%, rgba(255, 107, 43, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 400px 300px at 50% 50%, rgba(168, 85, 247, 0.04) 0%, transparent 70%);
+            animation: bgShift 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgShift {
+            0% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05)
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        #root {
+            position: relative;
+            z-index: 1
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px
+        }
+
+        .glass {
+            background: linear-gradient(135deg, rgba(15, 18, 30, 0.85), rgba(10, 12, 22, 0.92));
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 4px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 8px
+        }
+
+        .logo-icon {
+            font-size: 3.2rem;
+            display: block;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 0 20px rgba(240, 192, 64, 0.4))
+        }
+
+        .logo-text {
+            font-size: 2.6rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--gold), #ffd97a, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 8px rgba(240, 192, 64, 0.2));
+        }
+
+        .logo-sub {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            margin-top: 4px
+        }
+
+        .field {
+            margin-bottom: 22px
+        }
+
+        .field-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 0.95rem
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block
+        }
+
+        .dot-a {
+            background: var(--blue);
+            box-shadow: 0 0 8px var(--blue-glow)
+        }
+
+        .dot-b {
+            background: var(--orange);
+            box-shadow: 0 0 8px var(--orange-glow)
+        }
+
+        .field input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 14px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 500;
+            border: 1.5px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .field input::placeholder {
+            color: #3d4260
+        }
+
+        .field input:focus {
+            outline: none;
+            border-color: rgba(240, 192, 64, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 24px rgba(240, 192, 64, 0.08)
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent);
+            opacity: 0;
+            transition: opacity 0.3s
+        }
+
+        .btn:hover::after {
+            opacity: 1
+        }
+
+        .btn:hover {
+            transform: translateY(-2px)
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            transition: transform 0.1s
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #d4a530, #f0c040, #d4a530);
+            color: #0a0c14;
+            box-shadow: 0 4px 20px rgba(240, 192, 64, 0.25);
+            width: 100%;
+            padding: 18px;
+            font-size: 1.15rem;
+            margin-top: 8px;
+        }
+
+        .btn-gold:hover {
+            box-shadow: 0 6px 30px rgba(240, 192, 64, 0.4)
+        }
+
+        .btn-blue {
+            background: linear-gradient(135deg, #1a5fd4, var(--blue));
+            color: #fff;
+            box-shadow: 0 4px 16px var(--blue-glow)
+        }
+
+        .btn-orange {
+            background: linear-gradient(135deg, #d44a10, var(--orange));
+            color: #fff;
+            box-shadow: 0 4px 16px var(--orange-glow)
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #7e22ce, var(--purple));
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3);
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem
+        }
+
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-dim);
+            border: 1px solid var(--border)
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff
+        }
+
+        .btn-red {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            font-size: 0.85rem;
+            padding: 10px 20px
+        }
+
+        .btn-red:hover {
+            background: rgba(239, 68, 68, 0.2)
+        }
+
+        .scoreboard {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            max-width: 540px;
+            margin-bottom: 24px
+        }
+
+        .sb-card {
+            flex: 1;
+            padding: 16px 12px;
+            border-radius: 18px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid var(--border)
+        }
+
+        .sb-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px
+        }
+
+        .sb-a::before {
+            background: linear-gradient(90deg, transparent, var(--blue), transparent)
+        }
+
+        .sb-b::before {
+            background: linear-gradient(90deg, transparent, var(--orange), transparent)
+        }
+
+        .sb-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            opacity: 0.7
+        }
+
+        .sb-score {
+            font-size: 2.6rem;
+            font-weight: 900;
+            letter-spacing: -2px
+        }
+
+        .sb-a .sb-score {
+            color: var(--blue)
+        }
+
+        .sb-b .sb-score {
+            color: var(--orange)
+        }
+
+        .pick-banner {
+            text-align: center;
+            padding: 18px 24px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border: 1px solid
+        }
+
+        .pick-a {
+            background: rgba(45, 127, 249, 0.06);
+            border-color: rgba(45, 127, 249, 0.2);
+            color: #60a5fa
+        }
+
+        .pick-b {
+            background: rgba(255, 107, 43, 0.06);
+            border-color: rgba(255, 107, 43, 0.2);
+            color: #fb923c
+        }
+
+        .pick-counter {
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0.6;
+            margin-top: 4px
+        }
+
+        .tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 14px 0
+        }
+
+        .tag {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px
+        }
+
+        .tag-a {
+            background: rgba(45, 127, 249, 0.12);
+            color: #60a5fa;
+            border: 1px solid rgba(45, 127, 249, 0.25)
+        }
+
+        .tag-b {
+            background: rgba(255, 107, 43, 0.12);
+            color: #fb923c;
+            border: 1px solid rgba(255, 107, 43, 0.25)
+        }
+
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 640px
+        }
+
+        .cat-card {
+            padding: 24px 12px;
+            border-radius: 18px;
+            text-align: center;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.06), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s
+        }
+
+        .cat-card:hover {
+            border-color: rgba(168, 85, 247, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3)
+        }
+
+        .cat-card:hover::before {
+            opacity: 1
+        }
+
+        .cat-card.done {
+            opacity: 0.2;
+            pointer-events: none
+        }
+
+        .cat-card.done .cat-name {
+            text-decoration: line-through
+        }
+
+        .cat-card.picked {
+            opacity: 0.2;
+            pointer-events: none
+        }
+
+        .cat-icon {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 6px
+        }
+
+        .cat-name {
+            position: relative;
+            z-index: 1
+        }
+
+        .cat-prog {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 6px;
+            position: relative;
+            z-index: 1
+        }
+
+        /* Point level cards */
+        .lvl-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto
+        }
+
+        .lvl-card {
+            padding: 22px 8px;
+            border-radius: 18px;
+            text-align: center;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            color: #fff;
+            position: relative;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .lvl-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            background: rgba(168, 85, 247, 0.08);
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3)
+        }
+
+        .lvl-card.exhausted {
+            opacity: 0.15;
+            pointer-events: none
+        }
+
+        .lvl-pts {
+            font-size: 2rem;
+            font-weight: 900;
+            display: block
+        }
+
+        .lvl-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            display: block;
+            margin-top: 2px
+        }
+
+        .lvl-avail {
+            font-size: 0.65rem;
+            color: var(--green);
+            display: block;
+            margin-top: 4px;
+            font-weight: 700
+        }
+
+        .lvl-done {
+            font-size: 0.65rem;
+            color: var(--red);
+            display: block;
+            margin-top: 4px;
+            font-weight: 700
+        }
+
+        .q-panel {
+            width: 100%;
+            max-width: 580px
+        }
+
+        .q-cat-label {
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--purple);
+            letter-spacing: 1px;
+            margin-bottom: 6px
+        }
+
+        .q-pts-badge {
+            display: inline-block;
+            padding: 4px 18px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--purple);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            margin: 0 auto 16px;
+            text-align: center;
+        }
+
+        .q-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 28px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .q-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.3), transparent)
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 2;
+            color: #f0f2fa
+        }
+
+        .q-answer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--green)
+        }
+
+        .team-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px
+        }
+
+        .team-row .btn {
+            flex: 1;
+            padding: 16px;
+            font-size: 1rem
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-align: center;
+            color: #fff;
+            margin-bottom: 4px
+        }
+
+        .section-sub {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-align: center;
+            margin-bottom: 20px
+        }
+
+        .winner {
+            text-align: center
+        }
+
+        .winner-icon {
+            font-size: 5rem;
+            margin: 16px 0;
+            filter: drop-shadow(0 0 30px rgba(240, 192, 64, 0.5))
+        }
+
+        .winner-name {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 8px
+        }
+
+        .winner-label {
+            font-size: 1rem;
+            color: var(--text-dim);
+            margin-bottom: 24px
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            z-index: 100;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            backdrop-filter: blur(20px);
+            animation: toastIn 0.4s ease;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0)
+            }
+        }
+
+        .reset-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 16px
+        }
+
+        .db-stats {
+            text-align: center;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .db-stats strong {
+            color: var(--gold)
+        }
+
+        .fade-in {
+            animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1)
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .pop-in {
+            animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        @media(max-width:500px) {
+            .cat-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .logo-text {
+                font-size: 2rem
+            }
+
+            .glass {
+                padding: 28px 20px
+            }
+
+            .q-box {
+                padding: 28px 18px
+            }
+
+            .lvl-grid {
+                grid-template-columns: repeat(4, 1fr)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        /* ══════════════════════════════════════════════
+           Smart Question Tracking System
+           ══════════════════════════════════════════════ */
+        const STORAGE_KEY = "alluma_played_ids";
+        const CATEGORIES = Object.keys(QUESTIONS_DB);
+        const CAT_ICONS = {
+            "جغرافيا": "🌍", "تاريخ": "⏳", "علوم": "🔬", "رياضة": "⚽",
+            "إسلاميات": "☪️", "لغة عربية": "📝", "تكنولوجيا": "💻", "أفلام وترفيه": "🎬",
+            "طعام ومطبخ": "🍽️", "موسيقى": "🎵", "حيوانات": "🦁", "ألغاز ذكاء": "🧩"
+        };
+        const POINT_LEVELS = [1, 2, 3, 4];
+        const PICKS_PER_TEAM = 3;
+        const TOTAL_PICKS = PICKS_PER_TEAM * 2;
+
+        // ─── Unique ID: "category::questionText" ───
+        function qid(cat, qText) { return cat + "::" + qText; }
+
+        // ─── localStorage helpers (fast Set-based) ───
+        function loadPlayed() {
+            try { const d = localStorage.getItem(STORAGE_KEY); return d ? new Set(JSON.parse(d)) : new Set(); }
+            catch (e) { return new Set(); }
+        }
+        function savePlayed(set) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+        }
+        function clearPlayed() {
+            localStorage.removeItem(STORAGE_KEY);
+        }
+
+        // ─── Get available questions for a category+level ───
+        function getAvailable(cat, pts, playedSet) {
+            return QUESTIONS_DB[cat].filter(q => q.pts === pts && !playedSet.has(qid(cat, q.q)));
+        }
+
+        // ─── Random pick ───
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // ─── Count total questions in DB ───
+        function countAllQuestions() {
+            let total = 0;
+            for (const cat of CATEGORIES) total += QUESTIONS_DB[cat].length;
+            return total;
+        }
+
+        /* ══════════════════════════════════════════════
+           Main App
+           ══════════════════════════════════════════════ */
+        function App() {
+            const h = React.createElement;
+            const [screen, setScreen] = React.useState("setup");
+            const [teamA, setTeamA] = React.useState("");
+            const [teamB, setTeamB] = React.useState("");
+            const [scoreA, setScoreA] = React.useState(0);
+            const [scoreB, setScoreB] = React.useState(0);
+            const [selectedCat, setSelectedCat] = React.useState(null);
+            const [selectedQ, setSelectedQ] = React.useState(null);
+            const [showAnswer, setShowAnswer] = React.useState(false);
+            const [pickedCats, setPickedCats] = React.useState([]);
+            const [pickTurn, setPickTurn] = React.useState("a");
+            const [activeCats, setActiveCats] = React.useState([]);
+            const [toast, setToast] = React.useState(null);
+
+            // Smart tracking state (Set of played IDs)
+            const [played, setPlayed] = React.useState(() => loadPlayed());
+
+            // Persist played to localStorage whenever it changes
+            React.useEffect(() => { savePlayed(played); }, [played]);
+
+            // Toast auto-dismiss
+            React.useEffect(() => {
+                if (toast) { const t = setTimeout(() => setToast(null), 2500); return () => clearTimeout(t); }
+            }, [toast]);
+
+            const totalQ = React.useMemo(() => countAllQuestions(), []);
+            const playedCount = played.size;
+
+            const startPicking = () => {
+                if (teamA.trim() && teamB.trim()) { setPickedCats([]); setPickTurn("a"); setScreen("pick") }
+            };
+
+            const resetHistory = () => {
+                clearPlayed();
+                setPlayed(new Set());
+                setToast("✅ تم مسح سجل الأسئلة بنجاح!");
+            };
+
+            const teamACount = pickedCats.filter(p => p.team === "a").length;
+            const teamBCount = pickedCats.filter(p => p.team === "b").length;
+
+            const pickCategory = (cat) => {
+                const np = [...pickedCats, { cat, team: pickTurn }];
+                setPickedCats(np);
+                if (np.length >= TOTAL_PICKS) { setActiveCats(np.map(p => p.cat)); setScreen("grid"); return }
+                const aC = np.filter(p => p.team === "a").length, bC = np.filter(p => p.team === "b").length;
+                if (pickTurn === "a" && aC < PICKS_PER_TEAM && bC >= PICKS_PER_TEAM) setPickTurn("a");
+                else if (pickTurn === "b" && bC < PICKS_PER_TEAM && aC >= PICKS_PER_TEAM) setPickTurn("b");
+                else setPickTurn(pickTurn === "a" ? "b" : "a");
+            };
+
+            const openCategory = (cat) => { setSelectedCat(cat); setScreen("category") };
+
+            // ─── Smart Random Question Selection ───
+            const selectLevel = (cat, pts) => {
+                const avail = getAvailable(cat, pts, played);
+                if (avail.length === 0) {
+                    setToast("🔒 تم الإجابة على جميع أسئلة هذا المستوى!");
+                    return;
+                }
+                const chosen = pickRandom(avail);
+                setSelectedQ({ ...chosen, catName: cat });
+                setShowAnswer(false);
+                setScreen("question");
+            };
+
+            const markPlayed = () => {
+                if (!selectedQ) return;
+                const id = qid(selectedQ.catName, selectedQ.q);
+                setPlayed(prev => { const ns = new Set(prev); ns.add(id); return ns; });
+                setSelectedQ(null); setShowAnswer(false); setScreen("category");
+            };
+
+            const awardPoints = (team) => {
+                if (!selectedQ) return;
+                if (team === "a") setScoreA(s => s + selectedQ.pts); else setScoreB(s => s + selectedQ.pts);
+                markPlayed();
+            };
+            const skipQuestion = () => { if (selectedQ) markPlayed(); };
+
+            // ─── Category completion check ───
+            const isCatComplete = (cat) => {
+                return QUESTIONS_DB[cat].every(q => played.has(qid(cat, q.q)));
+            };
+            const catAvailCount = (cat) => {
+                return QUESTIONS_DB[cat].filter(q => !played.has(qid(cat, q.q))).length;
+            };
+            const levelAvailCount = (cat, pts) => getAvailable(cat, pts, played).length;
+
+            const allDone = activeCats.length > 0 && activeCats.every(c => isCatComplete(c));
+
+            const resetGame = () => {
+                setScreen("setup"); setScoreA(0); setScoreB(0);
+                setPickedCats([]); setActiveCats([]); setSelectedCat(null); setSelectedQ(null);
+            };
+
+            // ─── LOGO ───
+            const Logo = (sz) => h("div", { className: "logo" },
+                h("span", { className: "logo-icon" }, "🎲"),
+                h("span", { className: "logo-text", style: sz ? { fontSize: sz } : null }, "اللمة"),
+            );
+
+            // ─── SCOREBOARD ───
+            const SB = h("div", { className: "scoreboard" },
+                h("div", { className: "sb-card sb-a" }, h("div", { className: "sb-name" }, teamA), h("div", { className: "sb-score" }, scoreA)),
+                h("div", { className: "sb-card sb-b" }, h("div", { className: "sb-name" }, teamB), h("div", { className: "sb-score" }, scoreB))
+            );
+
+            // ─── TOAST ───
+            const ToastEl = toast ? h("div", { className: "toast" }, toast) : null;
+
+            // ═══════ SETUP ═══════
+            if (screen === "setup") {
+                return h("div", { className: "app fade-in" },
+                    h("div", { className: "glass", style: { width: "100%", maxWidth: "420px" } },
+                        Logo(),
+                        h("div", { className: "logo-sub" }, "لعبة المعلومات العامة"),
+                        h("div", { style: { height: 28 } }),
+                        h("div", { className: "field" },
+                            h("label", { className: "field-label" }, h("span", { className: "dot dot-a" }), "الفريق الأول"),
+                            h("input", { value: teamA, onChange: e => setTeamA(e.target.value), placeholder: "أدخل اسم الفريق" })
+                        ),
+                        h("div", { className: "field" },
+                            h("label", { className: "field-label" }, h("span", { className: "dot dot-b" }), "الفريق الثاني"),
+                            h("input", { value: teamB, onChange: e => setTeamB(e.target.value), placeholder: "أدخل اسم الفريق" })
+                        ),
+                        h("button", { className: "btn btn-gold", onClick: startPicking, disabled: !teamA.trim() || !teamB.trim() }, "ابدأ اللعبة")
+                    ),
+                    ToastEl
+                );
+            }
+
+            // ═══════ PICK ═══════
+            if (screen === "pick") {
+                const currentTeam = pickTurn === "a" ? teamA : teamB;
+                const currentCount = pickTurn === "a" ? teamACount : teamBCount;
+                const alreadyPicked = pickedCats.map(p => p.cat);
+                return h("div", { className: "app fade-in" },
+                    Logo("1.8rem"),
+                    h("div", { className: "pick-banner " + (pickTurn === "a" ? "pick-a" : "pick-b") },
+                        "دور " + currentTeam + " — اختر التصنيف " + (currentCount + 1) + " من " + PICKS_PER_TEAM,
+                        h("div", { className: "pick-counter" }, "إجمالي المختار: " + pickedCats.length + " / " + TOTAL_PICKS)
+                    ),
+                    pickedCats.length > 0 && h("div", { className: "tags" },
+                        pickedCats.map((p, i) => h("span", { key: i, className: "tag " + (p.team === "a" ? "tag-a" : "tag-b") }, p.cat))
+                    ),
+                    h("div", { className: "cat-grid" },
+                        CATEGORIES.map(cat => {
+                            const isPicked = alreadyPicked.includes(cat);
+                            const avail = catAvailCount(cat);
+                            return h("button", { key: cat, className: "cat-card" + (isPicked ? " picked" : ""), onClick: () => !isPicked && pickCategory(cat) },
+                                h("span", { className: "cat-icon" }, CAT_ICONS[cat] || "📁"),
+                                h("span", { className: "cat-name" }, cat),
+                                h("span", { className: "cat-prog" }, avail + " سؤال متاح")
+                            );
+                        })
+                    ),
+                    ToastEl
+                );
+            }
+
+            // ═══════ WINNER ═══════
+            if (allDone) {
+                const isDraw = scoreA === scoreB; const winner = scoreA > scoreB ? teamA : teamB;
+                const wColor = scoreA > scoreB ? "var(--blue)" : "var(--orange)";
+                return h("div", { className: "app fade-in" },
+                    h("div", { className: "glass winner", style: { width: "100%", maxWidth: "480px" } },
+                        h("div", { className: "winner-icon" }, isDraw ? "🤝" : "🏆"),
+                        h("div", { className: "winner-label" }, isDraw ? "انتهت اللعبة بالتعادل!" : "الفائز في هذه الجولة"),
+                        h("div", { className: "winner-name", style: { color: isDraw ? "var(--gold)" : wColor } }, isDraw ? "تعادل!" : winner),
+                        SB,
+                        h("button", { className: "btn btn-gold", onClick: resetGame, style: { marginTop: 16 } }, "🔄 لعبة جديدة")
+                    ), ToastEl
+                );
+            }
+
+            // ═══════ GRID ═══════
+            if (screen === "grid") {
+                return h("div", { className: "app fade-in" },
+                    Logo("1.6rem"), SB,
+                    h("div", { className: "cat-grid" },
+                        activeCats.map(cat => {
+                            const avail = catAvailCount(cat); const total = QUESTIONS_DB[cat].length;
+                            return h("button", { key: cat, className: "cat-card" + (avail === 0 ? " done" : ""), onClick: () => openCategory(cat) },
+                                h("span", { className: "cat-icon" }, CAT_ICONS[cat] || "📁"),
+                                h("span", { className: "cat-name" }, cat),
+                                h("span", { className: "cat-prog" }, avail + " / " + total + " متاح")
+                            );
+                        })
+                    ), ToastEl
+                );
+            }
+
+            // ═══════ CATEGORY (Point Levels) ═══════
+            if (screen === "category" && selectedCat) {
+                return h("div", { className: "app fade-in" },
+                    SB,
+                    h("div", { className: "section-title" }, (CAT_ICONS[selectedCat] || "") + " " + selectedCat),
+                    h("div", { className: "section-sub" }, "اختر مستوى النقاط — يتم اختيار السؤال عشوائياً"),
+                    h("div", { className: "lvl-grid" },
+                        POINT_LEVELS.map((pts, i) => {
+                            const avail = levelAvailCount(selectedCat, pts);
+                            const exhausted = avail === 0;
+                            return h("button", {
+                                key: pts + "-" + i,
+                                className: "lvl-card pop-in" + (exhausted ? " exhausted" : ""),
+                                onClick: () => selectLevel(selectedCat, pts),
+                                style: { animationDelay: i * 80 + "ms" }
+                            },
+                                h("span", { className: "lvl-pts" }, pts),
+                                exhausted
+                                    ? h("span", { className: "lvl-done" }, "انتهت ✓")
+                                    : h("span", { className: "lvl-avail" }, avail + " متاح")
+                            );
+                        })
+                    ),
+                    h("button", { className: "btn btn-ghost", onClick: () => { setSelectedCat(null); setScreen("grid") }, style: { marginTop: 16 } }, "↩ العودة"),
+                    ToastEl
+                );
+            }
+
+            // ═══════ QUESTION ═══════
+            if (screen === "question" && selectedQ) {
+                return h("div", { className: "app fade-in" },
+                    SB,
+                    h("div", { className: "q-panel" },
+                        h("div", { className: "q-cat-label" }, selectedQ.catName),
+                        h("div", { style: { textAlign: "center" } }, h("span", { className: "q-pts-badge" }, selectedQ.pts + " نقاط")),
+                        h("div", { className: "q-box" },
+                            h("div", { className: "q-text" }, selectedQ.q),
+                            showAnswer && h("div", { className: "q-answer" }, "✅ " + selectedQ.a)
+                        ),
+                        !showAnswer && h("button", { className: "btn btn-purple", onClick: () => setShowAnswer(true), style: { marginTop: 16 } }, "👁 كشف الإجابة"),
+                        showAnswer && h("div", null,
+                            h("div", { className: "team-row" },
+                                h("button", { className: "btn btn-blue", onClick: () => awardPoints("a") }, "✅ " + teamA),
+                                h("button", { className: "btn btn-orange", onClick: () => awardPoints("b") }, "✅ " + teamB)
+                            ),
+                            h("button", { className: "btn btn-ghost", onClick: skipQuestion, style: { width: "100%", marginTop: 10 } }, "✗ لا أحد أجاب")
+                        )
+                    ), ToastEl
+                );
+            }
+
+            return h("div", { className: "app" }, "...");
+        }
+
+        ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW registered'))
+                    .catch(err => console.log('SW failed', err));
+            });
+        }
+    </script>
+</body>
+
+</html>
