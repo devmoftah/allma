@@ -5,10 +5,10 @@
   "description": "لعبة المعلومات العامة للفريقين - تنافس، تحدى، واستمتع مع أصدقائك في أجواء من الحماس والمعرفة.",
   "start_url": "index.html",
   "scope": ".",
-  "display": "standalone",
+  "display": "fullscreen",
   "display_override": [
-    "window-controls-overlay",
-    "minimal-ui"
+    "fullscreen",
+    "standalone"
   ],
   "orientation": "portrait",
   "background_color": "#06080f",
