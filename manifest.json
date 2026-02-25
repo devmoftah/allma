@@ -1,12 +1,23 @@
 {
+  "id": "com.alluma.trivia.app",
   "name": "اللمة - لعبة المعلومات",
   "short_name": "اللمة",
-  "description": "لعبة المعلومات العامة للفريقين",
-  "start_url": "./index.html",
+  "description": "لعبة المعلومات العامة للفريقين - تنافس، تحدى، واستمتع مع أصدقائك في أجواء من الحماس والمعرفة.",
+  "start_url": "index.html",
+  "scope": ".",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "minimal-ui"
+  ],
   "orientation": "portrait",
   "background_color": "#06080f",
   "theme_color": "#06080f",
+  "categories": [
+    "games",
+    "education",
+    "entertainment"
+  ],
   "dir": "rtl",
   "lang": "ar",
   "icons": [
@@ -14,13 +25,36 @@
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "شاشة اللعبة على الجوال"
+    },
+    {
+      "src": "screenshot-desktop.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "واجهة اللعبة الاحترافية"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "ابدأ اللعبة",
+      "url": "index.html",
+      "description": "ابدأ جولة جديدة مباشرة"
     }
   ]
 }
